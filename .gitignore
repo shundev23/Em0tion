@@ -1,0 +1,5 @@
+.env
+your_program_name  # go buildで生成される実行ファイル名（もしビルドする場合）
+bin/             # ビルドした実行ファイルを格納する場合
+.vscode/          # VS Codeを使用している場合
+.idea/            # GoLandを使用している場合
