@@ -90,21 +90,23 @@ func AnalyzeSentiment(inputText string, apiKey string) (sentiment.Result, error)
 	if len(response.Candidates) > 0 && len(response.Candidates[0].Content.Parts) > 0 {
 		rawResponse = response.Candidates[0].Content.Parts[0].Text
 	}
+	fmt.Printf("APIからの生レスポンス:\n%s\n", rawResponse)
 
 	result := sentiment.Result{
 		RawResponse: rawResponse,
 	}
 
 	// 感情の種類を抽出
-	sentimentRegex := regexp.MustCompile(`\*\s*\*\*感情:\*\*\s*([^\n]*)`)
+	sentimentRegex := regexp.MustCompile(`感情[：:]\s*(\S+)`)
 	sentimentMatch := sentimentRegex.FindStringSubmatch(rawResponse)
+	fmt.Printf("正規表現マッチの結果: %v¥n", sentimentMatch)
 	if len(sentimentMatch) > 1 {
 		result.SentimentType = strings.TrimSpace(sentimentMatch[1])
 		// 度合いを抽出 (パターン1: "**度合い:** 9 (10が最高)")
-		degreeRegex1 := regexp.MustCompile(`\*\s*\*\*度合い:\*\*\s*(\d+)`)
-		degreeMatch1 := degreeRegex1.FindStringSubmatch(rawResponse)
-		if len(degreeMatch1) > 1 {
-			score, _ := strconv.Atoi(degreeMatch1[1])
+		degreeRegex := regexp.MustCompile(`度合い[：:]\s*(\d+)/10`)
+		degreeMatch := degreeRegex.FindStringSubmatch(rawResponse)
+		if len(degreeMatch) > 1 {
+			score, _ := strconv.Atoi(degreeMatch[1])
 			result.Score = score
 		}
 	} else {
